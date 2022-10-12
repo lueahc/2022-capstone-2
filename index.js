@@ -1,12 +1,16 @@
 const express = require('express');
 const app = express();
+
 const passport = require('passport');
 const session = require('express-session');
 require('dotenv').config();
+
 const memberRouter = require('./routes/member');
 const testRouter = require('./routes/test');
 const authRouter = require('./routes/auth');
+
 const { sequelize } = require('./models');
+
 const PORT = process.env.PORT || 3000;
 
 //sequelize
