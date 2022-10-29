@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const tokenAuth = require('../utils/tokenAuth');
-const { member } = require('../models');
+const { member, sequelize } = require('../models');
 require('dotenv').config();
 
 router.post('/login', async(req, res) => {
@@ -10,36 +10,49 @@ router.post('/login', async(req, res) => {
     const tokenResult = await tokenAuth.getProfile(accessToken);
     const memberID = tokenResult.kakao_account.email;
 
-    member.findOne({ where: { id: memberID } })
-        .then(result => {
+    console.log(`accessToken:${accessToken}, memberID:${memberID}`);
+
+    member.findOne({ where: { id: memberID }
+    }).then(result => {
+            const memberType = result.dataValues.type;
+            const memberName = result.dataValues.name;
+
             if (result) {   //if 있는 계정 -> 로그인
-                //jwt 발행 및 쿠키
-                const token = jwt.sign({
+                const jwtToken = jwt.sign({
                     id: memberID,
                 }, process.env.JWT_SECRET, {
                     //issuer: '',
                 });
 
-                const jwtOptions = {
-                    //maxAge: process.env.JWT_EXPIRE * 1000,
-                    httpOnly: true,
-                    sameSite: 'none',   //client-server 서로 다른 ip여도 동작
-                    secure: true,   //"
-                };
+                // const jwtOptions = {
+                //     //maxAge: process.env.JWT_EXPIRE * 1000,
+                //     httpOnly: true,
+                //     sameSite: 'none',   //client-server 서로 다른 ip여도 동작
+                //     secure: true,   //"
+                // };
 
-                res.cookie('token', token, jwtOptions);
-                return res.sendStatus(200);
-            }
-            else {  //if 없는 계정 -> 가입 -> 로그인
+                const resData = {
+                    id: memberID,
+                    name: memberName,
+                    type: memberType,
+                    jwtToken: jwtToken,
+                }
 
+               // res.cookie('token', token, jwtOptions);
+                return res.status(200).send(resData);
             }
+
+            return res.sendStatus(400);    //if 없는 계정
         });
 })
 
 router.post('/sign-up', async(req, res) => {
-    const memberID = req.body.id;
+    const accessToken = req.headers['authorization'];
+    const tokenResult = await tokenAuth.getProfile(accessToken);
+    const memberID = tokenResult.kakao_account.email;
+    const memberName = tokenResult.kakao_account.profile.nickname;
+
     const memberType = req.body.type;
-    const memberName = req.body.name;
     const memberEmpnum = req.body.empnum;
     const memberHp = req.body.hp;
 
@@ -49,18 +62,56 @@ router.post('/sign-up', async(req, res) => {
         name: memberName,
         empnum: memberEmpnum,
         hp: memberHp,
-    }).then(_ => console.log());
+    }).then(_ => {  //자동로그인
+        const jwtToken = jwt.sign({
+            id: memberID,
+        }, process.env.JWT_SECRET,
+        );
 
-    return res.sendStatus(201);
+        const resData = {
+            id: memberID,
+            name: memberName,
+            type: memberType,
+            jwtToken: jwtToken,
+        }
+
+        return res.status(201).send(resData);
+    });
+
+    //TODO: error 시 return
+})
+
+router.post('/leave', async(req, res) => {
+    //TODO: const memberID = 
+
+    try {
+        await sequelize.transaction(async(t) => {
+            const memberResult = await member.findOne({ where: { id: memberId }});
+            //TODO: id 부재 시
+
+            await member.update(
+                { deleted_at: sequelize.literal('now()') },
+                {
+                   where: { id: memberId },
+                   transaction: t,
+                },
+             );
+
+             return res.sendStatus(204);
+        })
+    } catch(err) {
+        console.log(err);
+        //TODO:
+    }
 })
 
 
 //jwtToken verify 테스트 용
 router.post('/verify', async (req, res) => {
-    //
-    const token = req.headers.token;
+    const jwtToken = req.headers.jwtToken;
+
     try {
-        let decoded = await tokenAuth.verifyToken(token);
+        let decoded = await tokenAuth.verifyToken(jwtToken);
         console.log(decoded);
         if (decoded) {
             return res.send('성공');

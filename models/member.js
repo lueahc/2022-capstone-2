@@ -14,11 +14,6 @@ module.exports = function(sequelize, DataTypes) {
       comment: "아이디",
       unique: "id"
     },
-    pw: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-      comment: "비밀번호"
-    },
     type: {
       type: DataTypes.TINYINT,
       allowNull: false,
@@ -39,6 +34,11 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.STRING(20),
       allowNull: true,
       comment: "전화번호"
+    },
+    deleted_at: {
+      type: DataTypes.DATE,
+      allowNull: true,
+      comment: "탈퇴일"
     }
   }, {
     sequelize,
