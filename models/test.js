@@ -31,14 +31,10 @@ module.exports = function(sequelize, DataTypes) {
       allowNull: false,
       comment: "불량여부"
     },
-    defected_id: {
-      type: DataTypes.INTEGER,
+    defectedType: {
+      type: DataTypes.STRING(50),
       allowNull: true,
-      comment: "불량ID",
-      references: {
-        model: 'defected',
-        key: 'defected_id'
-      }
+      comment: "불량유형",
     },
     isfixed: {
       type: DataTypes.TINYINT,
@@ -53,11 +49,17 @@ module.exports = function(sequelize, DataTypes) {
         model: 'memo',
         key: 'memo_id'
       }
+    },
+    image: {
+      type: DataTypes.STRING(200),
+      allowNull: false,
+      defaultValue: "",
+      comment: "이미지",
     }
   }, {
     sequelize,
     tableName: 'test',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",
@@ -79,13 +81,6 @@ module.exports = function(sequelize, DataTypes) {
         using: "BTREE",
         fields: [
           { name: "part_id" },
-        ]
-      },
-      {
-        name: "defected_id",
-        using: "BTREE",
-        fields: [
-          { name: "defected_id" },
         ]
       },
       {

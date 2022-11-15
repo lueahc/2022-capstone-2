@@ -3,11 +3,11 @@ const app = express();
 
 const passport = require('passport');
 const session = require('express-session');
+const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
-const memberRouter = require('./routes/member');
-const testRouter = require('./routes/test');
-const authRouter = require('./routes/auth');
+const inspectionRouter = require('./src/routes/inspectionRouter');
+const authRouter = require('./src/routes/authRouter');
 
 const { sequelize } = require('./models');
 
@@ -23,6 +23,7 @@ sequelize.sync({ force: false })
     });
 
 app.use(express.json());
+app.use(cookieParser());
 
 //세션
 app.use(session({
@@ -40,8 +41,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //라우터
-app.use('/member', memberRouter);
-app.use('/test', testRouter);
+app.use('/inspection', inspectionRouter);
 app.use('/auth', authRouter);
 
 app.get('/', (req, res) => {res.send('SERVER 연결');});

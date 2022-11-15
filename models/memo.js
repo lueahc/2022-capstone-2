@@ -25,7 +25,7 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     sequelize,
     tableName: 'memo',
-    timestamps: true,
+    timestamps: false,
     indexes: [
       {
         name: "PRIMARY",
