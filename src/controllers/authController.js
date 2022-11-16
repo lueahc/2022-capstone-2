@@ -50,7 +50,7 @@ const authController = {
 
         const tokenResult = await authService.getProfile(accessToken);
         const memberEmail = tokenResult.kakao_account.email;
-        const memberName = tokenResult.kakao_account.profile.nickname;  //TODO: 이름?
+        const memberName = tokenResult.kakao_account.profile.nickname;
 
         const data = {
             id: memberEmail,

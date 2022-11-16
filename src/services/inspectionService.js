@@ -3,8 +3,9 @@ const inspectionDao = require('../daos/inspectionDao');
 const { test, sequelize } = require('../../models');
 
 const inspectionService = {
-    //TODO: try-catch
-    
+    test: async() => {
+    },
+
     findPart: async(defectedType) => {
         let partId;
         switch(defectedType) {
@@ -37,7 +38,7 @@ const inspectionService = {
     },
 
     createInspection: async(data) => {
-        const testResult = test.create({
+        const testResult = await test.create({
             tester_id: data.testerId,
             part_id: data.partId,
             isdefected: data.isDefected,
@@ -52,6 +53,7 @@ const inspectionService = {
     retrieveInspectionList: async(data, sort) => {
         const pageSize = 10;
         const page = data.page;
+        const testerId = data.testerId;
 
         let start = 0;
         let hasNextPage = true;
@@ -59,7 +61,7 @@ const inspectionService = {
         if (page <= 0) page = 1;
         else start = (page - 1) * pageSize;
 
-        const cnt = await test.count();
+        const cnt = await test.count({ where: { tester_id: testerId }});
         if (page > Math.round(cnt / pageSize)) return null;
         if ((page + 1) > Math.round(cnt / pageSize)) hasNextPage = false;
 

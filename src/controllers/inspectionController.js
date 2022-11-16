@@ -60,35 +60,32 @@ async function encodeImage(path) {
 }
 
 const inspectionController = {
-    //TODO: 에러 처리
+    test: async(req, res) => {
+    },
 
-    toFlask: async(req, res, next) => {
-        //TODO: file 없을 경우
-        // if(!req.file.filename) {
-        //     return res.send('IMAGE_EMPTY');
-        // }
-
+    toFlask: async (req, res, next) => {
         upload(req, res, err => {
-            if(req.fileValidationError == 'error') {
+            if (!req.file)
+                return res.send('IMAGE_EMPTY');
+            if (req.fileValidationError == 'error')
                 return res.send('IMAGE_UPLOAD_ERROR');
-            } else {
-                const filename = `images/before/${req.file.filename}`;
-                const formData = new FormData();
-                formData.append('file', fs.createReadStream(filename));
-            
-                axios({
-                    method: 'post',
-                    url: process.env.FLASK_SERVER,
-                    headers: {
-                        'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
-                    },
-                    data: formData
-                })
-                .then(response => {                  
+
+            const filename = `images/before/${req.file.filename}`;
+            const formData = new FormData();
+            formData.append('file', fs.createReadStream(filename));
+
+            axios({
+                method: 'post',
+                url: process.env.FLASK_SERVER,
+                headers: {
+                    'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
+                },
+                data: formData
+            })
+                .then(response => {
                     req.modelData = response.data;
                     next();
                 })
-            }
         })
     },
 
@@ -123,18 +120,20 @@ const inspectionController = {
             image: newFileName
         }
 
-        const inspection = await inspectionService.createInspection(insertData);    //TODO: orm 가공
+        const inspection = await inspectionService.createInspection(insertData);
 
-        const resData = {
-            result: inspection,
-            imageStr: imageStr
-        }
+        const testId = inspection.dataValues.test_id;
+        const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
+        const filePath = inspectionDetails.image;
+        const imageString = await encodeImage(filePath);
 
-        return res.send(resData);
+        inspectionDetails.imageStr = imageString;
+
+        return res.send(inspectionDetails);
     },
 
     getList: async(req, res) => {
-        //const memberId = req.memberId;
+        //FIXME: const memberId = req.memberId;
         const memberId = 3;
         const part = req.query.part;
         const result = req.query.result;
@@ -165,13 +164,11 @@ const inspectionController = {
 
         const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
         const filePath = inspectionDetails.image;
-        const imageStr = await encodeImage(filePath);
-        const resData = {
-            result: inspectionDetails,
-            imageStr: imageStr
-        }
+        const imageString = await encodeImage(filePath);
 
-        return res.send(resData);
+        inspectionDetails.imageStr = imageString;
+
+        return res.send(inspectionDetails);
     }
 }
 

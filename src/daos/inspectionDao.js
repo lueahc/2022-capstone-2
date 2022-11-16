@@ -111,6 +111,7 @@ async function selectInspectionById(connection, testId) {
             (select part.name from part where test.part_id = part.part_id) as partName,
             (select part.stock from part where test.part_id = part.part_id) as partStock,
             isdefected as isDefected,
+            defectedType,
             isfixed as isFixed,
             date_format(created_at, '%Y/%m/%d %H:%i:%s') as date,
             (select memo.content from memo where test.memo_id = memo.memo_id) as memo,

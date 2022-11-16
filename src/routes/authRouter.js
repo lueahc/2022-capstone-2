@@ -3,7 +3,6 @@ const router = express.Router();
 const authController = require('../controllers/authController');
 const jwtMiddleware = require('../middlewares/jwtMiddleware');
 
-//TODO: delete_at 확인 middleware
 router.post('/login', authController.login);
 router.post('/sign-up', authController.signUp);
 router.post('/leave', jwtMiddleware.verifyToken, authController.leave);

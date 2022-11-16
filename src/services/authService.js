@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 const authService = {
-    //TODO: 에러 처리 / try-catch
-
     getProfile: async (accessToken) => {
         const options = {   //axios option
             method: 'get',
