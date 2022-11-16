@@ -4,11 +4,12 @@ const path = require('path');
 const fs = require('fs');
 const FormData = require('form-data');
 const axios = require('axios');
+const imageToBase64 = require('image-to-base64');
 require('dotenv').config();
 
 var storage = multer.diskStorage({  //저장 방식
     destination: (req, file, callBack) => { //저장 위치
-        callBack(null, 'images/')
+        callBack(null, 'images/before/')
     },
     filename: (req, file, callBack) => {    //저장 파일명
         const ext = path.extname(file.originalname);
@@ -35,9 +36,32 @@ const upload = multer({
     fileFilter: fileFilter
 }).single('filename');
 
+async function decodeImage(string) {
+    const decodedImage = {}
+    decodedImage.data = new Buffer.from(string, 'base64');
+    return decodedImage;
+}
+
+async function encodeImage(path) {
+    imageToBase64(path) //인코딩
+    .then(
+        (response) => {
+            // const output = Date.now() + "output.txt"
+            // fs.writeFileSync(output, response);
+            // res.download(output);
+            return response;
+        }
+    )
+    .catch(
+        (error) => {
+            console.log(error);
+        }
+    )
+}
+
 const inspectionController = {
     //TODO: 에러 처리
-    
+
     toFlask: async(req, res, next) => {
         //TODO: file 없을 경우
         // if(!req.file.filename) {
@@ -48,7 +72,7 @@ const inspectionController = {
             if(req.fileValidationError == 'error') {
                 return res.send('IMAGE_UPLOAD_ERROR');
             } else {
-                const filename = `images/${req.file.filename}`;
+                const filename = `images/before/${req.file.filename}`;
                 const formData = new FormData();
                 formData.append('file', fs.createReadStream(filename));
             
@@ -60,10 +84,8 @@ const inspectionController = {
                     },
                     data: formData
                 })
-                .then(response => {
-                    const modelData = response.data;
-
-                    req.modelData = modelData;
+                .then(response => {                  
+                    req.modelData = response.data;
                     next();
                 })
             }
@@ -71,19 +93,41 @@ const inspectionController = {
     },
 
     toAndroid: async(req, res) => {
-        const modelData = req.modelData;
-        const data = {
+        //이미지 디코딩 후 저장
+        const imageStr = req.modelData.res_json['img']['0'];
+        const imageBuffer = await decodeImage(imageStr);
+        const newFileName = `images/after/${Date.now()}.jpg`;
+
+        fs.writeFile(newFileName, imageBuffer.data, err => {})
+
+        const memberId = req.memberId;  //tester_id
+        const defectedType = req.modelData.res_json['name']['0'];   //defectedType
+        let isDefected, isFixed;    //isdefected, isfixed
+        if(defectedType == null) {
+            isDefected = 0;
+            isFixed = null;
+        } else {
+            isDefected = 1;
+            isFixed = 0
+        }
+        const partId = await inspectionService.findPart(defectedType);  //part_id
+
+        if(!imageStr) return res.send('IMAGE_EMPTY');
+
+        const insertData = {
             testerId: memberId,
-            part: part,
-            result: result,
-            offset: offset,
-            limit: limit
+            partId: partId,
+            isDefected: isDefected,
+            defectedType: defectedType,
+            isFixed: isFixed,
+            image: newFileName
         }
 
-        const inspection = await inspectionService.createInspection(data);
+        const inspection = await inspectionService.createInspection(insertData);    //TODO: orm 가공
 
         const resData = {
-            result: inspection
+            result: inspection,
+            imageStr: imageStr
         }
 
         return res.send(resData);
@@ -94,9 +138,10 @@ const inspectionController = {
         const memberId = 3;
         const part = req.query.part;
         const result = req.query.result;
-        //TODO: limit
-        let offset = 1;
-        let limit = 5;
+        const pageInfo = req.query.page;
+        const page = parseInt(pageInfo);
+
+        if(!pageInfo) return res.send('PAGE_EMPTY');
 
         if(!part && !result) sort = 'all';
         else if(!result) sort = 'part';
@@ -107,24 +152,23 @@ const inspectionController = {
             testerId: memberId,
             part: part,
             result: result,
-            offset: offset,
-            limit: limit
+            page: page
         }
 
         const inspectionList = await inspectionService.retrieveInspectionList(data, sort);
-        const resData = {
-            result: inspectionList
-        }
 
-        return res.send(resData);
+        return res.send(inspectionList);
     },
 
     getListById: async(req, res) => {
         const testId = req.params.testId;
 
         const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
+        const filePath = inspectionDetails.image;
+        const imageStr = await encodeImage(filePath);
         const resData = {
-            result: inspectionDetails
+            result: inspectionDetails,
+            imageStr: imageStr
         }
 
         return res.send(resData);

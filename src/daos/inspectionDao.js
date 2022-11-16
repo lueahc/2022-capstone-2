@@ -1,15 +1,19 @@
 //검사 내역 추가
 async function insertInspection(connection, data) {
-    const testerId = data.testId;
-    const partId = data.partId;
-    
+    const datas = [data.testerId, data.partId, data.isDefected, data.defectedType, data.isFixed, data.image];
+    const query = `
+        insert into test(tester_id, part_id, isdefected, defectedType, isfixed, image)
+        values(?, ?, ?, ?, ?, ?)`
+
+    const [rows] = await connection.query(query, datas);
+    return rows[0];
 }
 
 //검사 내역 목록 - 전체
 async function selectAllInspection(connection, data) {
+    const pageSize = 10;
     const testerId = data.testerId;
-    const offset = data.offset;
-    const limit = data.limit;
+    const start = data.start;
 
     const query = `
         select
@@ -21,7 +25,7 @@ async function selectAllInspection(connection, data) {
         from test 
         where tester_id = ${testerId} 
         order by test.created_at DESC 
-        limit ${offset}, ${limit};
+        limit ${start}, ${pageSize};
         `
         const [rows] = await connection.query(query);
         return rows;
@@ -29,10 +33,10 @@ async function selectAllInspection(connection, data) {
 
 //검사 내역 목록 - 부품 별
 async function selectInspectionSortByPart(connection, data) {
+    const pageSize = 10;
     const testerId = data.testerId;
     const part = data.part;
-    const offset = data.offset;
-    const limit = data.limit;
+    const start = data.start;
 
     const query = `
         select
@@ -44,7 +48,7 @@ async function selectInspectionSortByPart(connection, data) {
         from test 
         where tester_id = ${testerId} and test.part_id = ${part} 
         order by test.created_at DESC 
-        limit ${offset}, ${limit};
+        limit ${start}, ${pageSize};
         `
         const [rows] = await connection.query(query);
         return rows;
@@ -52,10 +56,10 @@ async function selectInspectionSortByPart(connection, data) {
 
 //검사 내역 목록 - 조치 결과 별
 async function selectInspectionSortByResult(connection, data) {
+    const pageSize = 10;
     const testerId = data.testerId;
     const result = data.result;
-    const offset = data.offset;
-    const limit = data.limit;
+    const start = data.start;
 
     const query = `
         select
@@ -67,7 +71,7 @@ async function selectInspectionSortByResult(connection, data) {
         from test 
         where tester_id = ${testerId} and test.isfixed = ${result} 
         order by test.created_at DESC 
-        limit ${offset}, ${limit};
+        limit ${start}, ${pageSize};
         `
         const [rows] = await connection.query(query);
         return rows;
@@ -75,11 +79,11 @@ async function selectInspectionSortByResult(connection, data) {
 
 //검사 내역 목록 - 부품 별 / 조치 결과 별
 async function selectInspectionSortByPartAndResult(connection, data) {
+    const pageSize = 10;
     const testerId = data.testerId;
     const part = data.part;
     const result = data.result;
-    const offset = data.offset;
-    const limit = data.limit;
+    const start = data.start;
 
     const query = `
         select
@@ -91,7 +95,7 @@ async function selectInspectionSortByPartAndResult(connection, data) {
         from test
         where tester_id = ${testerId} and test.isfixed = ${result} and test.part_id = ${part} 
         order by test.created_at DESC 
-        limit ${offset}, ${limit};
+        limit ${start}, ${pageSize};
         `
         const [rows] = await connection.query(query);
         return rows;
@@ -119,6 +123,7 @@ async function selectInspectionById(connection, testId) {
 }
 
 module.exports = {
+    insertInspection,
     selectAllInspection,
     selectInspectionSortByPart,
     selectInspectionSortByResult,
