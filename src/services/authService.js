@@ -30,9 +30,10 @@ const authService = {
         return memberResult;
     },
 
-    issueJwt: async(memberId) => {
+    issueJwt: async(memberId, memberType) => {
         const jwtToken = jwt.sign({
             id: memberId,
+            type: memberType
         }, process.env.JWT_SECRET, {
             //issuer: '',
         });

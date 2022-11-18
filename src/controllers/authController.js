@@ -21,7 +21,7 @@ const authController = {
         const memberType = memberResult.dataValues.type;
         const memberName = memberResult.dataValues.name;
 
-        const jwtToken = await authService.issueJwt(memberId);
+        const jwtToken = await authService.issueJwt(memberId, memberType);
 
         if(!jwtToken) {
             return res.send('JWT_ISSUE_ERROR');
@@ -67,7 +67,7 @@ const authController = {
         }
 
         const memberId = memberResult.dataValues.member_id;
-        const jwtToken = await authService.issueJwt(memberId);
+        const jwtToken = await authService.issueJwt(memberId, memberType);
 
         if(!jwtToken) {
             return res.send('JWT_ISSUE_ERROR');

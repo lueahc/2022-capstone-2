@@ -13,6 +13,7 @@ module.exports = {
             const decoded = jwt.verify(jwtToken, process.env.JWT_SECRET);
             if (decoded) {
                 req.memberId = decoded.id;
+                req.memberType = decoded.type;
                 //console.log(decoded.id);
                 next();
             } else {

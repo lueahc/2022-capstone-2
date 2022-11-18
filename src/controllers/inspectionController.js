@@ -137,6 +137,7 @@ const inspectionController = {
     getList: async(req, res) => {
         //FIXME: const memberId = req.memberId;
         const memberId = 3;
+        const memberType = req.memberType;  //사용자0 담당자1
         const part = req.query.part;
         const result = req.query.result;
         const pageInfo = req.query.page;
@@ -155,8 +156,6 @@ const inspectionController = {
             result: result,
             page: page
         }
-
-        const memberType = await inspectionService.selectMemberType(memberId);  //사용자0 담당자1
 
         let inspectionList;
         if(memberType == 0) inspectionList = await inspectionService.retrieveInspectionList(data, sort);
