@@ -1,6 +1,6 @@
 const pool = require('../../config/mysql');
 const inspectionDao = require('../daos/inspectionDao');
-const { test, sequelize } = require('../../models');
+const { member, test, sequelize } = require('../../models');
 
 const inspectionService = {
     test: async() => {
@@ -50,6 +50,15 @@ const inspectionService = {
         return testResult;
     },
 
+    selectMemberType: async(memberId) => {
+        const memberType = await member.findOne({
+            attributes: [ 'type' ],
+            where: { member_id: memberId }
+        });
+
+        return memberType;
+    },
+
     retrieveInspectionList: async(data, sort) => {
         const pageSize = 10;
         const page = data.page;
@@ -94,6 +103,41 @@ const inspectionService = {
         connection.release();
 
         return inspectionDetails[0];
+    },
+
+    retrieveDefectedList: async(data, sort) => {
+        const pageSize = 10;
+        const page = data.page;
+
+        let start = 0;
+        let hasNextPage = true;
+
+        if (page <= 0) page = 1;
+        else start = (page - 1) * pageSize;
+
+        const cnt = await test.count({ where: { isdefected: 1 }});
+        if (page > Math.round(cnt / pageSize)) return null;
+        if ((page + 1) > Math.round(cnt / pageSize)) hasNextPage = false;
+
+        data.start = start;
+
+        const connection = await pool.getConnection(async (conn) => conn);
+
+        let inspectionList;
+        if (sort == 'all') inspectionList = await inspectionDao.selectAllDefected(connection, data);
+        else if (sort == 'part') inspectionList = await inspectionDao.selectDefectedSortByPart(connection, data);
+        else if (sort == 'result') inspectionList = await inspectionDao.selectDefectedSortByResult(connection, data);
+        else if (sort == 'both') inspectionList = await inspectionDao.selectDefectedSortByPartAndResult(connection, data);
+
+        connection.release();
+
+        const resData = {
+            result: inspectionList,
+            hasNextPage: hasNextPage,
+            cnt: cnt
+        }
+
+        return resData;
     },
 }
 

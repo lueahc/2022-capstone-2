@@ -90,46 +90,48 @@ const inspectionController = {
     },
 
     toAndroid: async(req, res) => {
-        //이미지 디코딩 후 저장
-        const imageStr = req.modelData.res_json['img']['0'];
-        const imageBuffer = await decodeImage(imageStr);
-        const newFileName = `images/after/${Date.now()}.jpg`;
+        console.log(req.modelData);
 
-        fs.writeFile(newFileName, imageBuffer.data, err => {})
+        // //이미지 디코딩 후 저장
+        // const imageStr = req.modelData.res_json['img']['0'];
+        // const imageBuffer = await decodeImage(imageStr);
+        // const newFileName = `images/after/${Date.now()}.jpg`;
 
-        const memberId = req.memberId;  //tester_id
-        const defectedType = req.modelData.res_json['name']['0'];   //defectedType
-        let isDefected, isFixed;    //isdefected, isfixed
-        if(defectedType == null) {
-            isDefected = 0;
-            isFixed = null;
-        } else {
-            isDefected = 1;
-            isFixed = 0
-        }
-        const partId = await inspectionService.findPart(defectedType);  //part_id
+        // fs.writeFile(newFileName, imageBuffer.data, err => {})
 
-        if(!imageStr) return res.send('IMAGE_EMPTY');
+        // const memberId = req.memberId;  //tester_id
+        // const defectedType = req.modelData.res_json['name']['0'];   //defectedType
+        // let isDefected, isFixed;    //isdefected, isfixed
+        // if(defectedType == null) {
+        //     isDefected = 0;
+        //     isFixed = null;
+        // } else {
+        //     isDefected = 1;
+        //     isFixed = 0
+        // }
+        // const partId = await inspectionService.findPart(defectedType);  //part_id
 
-        const insertData = {
-            testerId: memberId,
-            partId: partId,
-            isDefected: isDefected,
-            defectedType: defectedType,
-            isFixed: isFixed,
-            image: newFileName
-        }
+        // if(!imageStr) return res.send('IMAGE_EMPTY');
 
-        const inspection = await inspectionService.createInspection(insertData);
+        // const insertData = {
+        //     testerId: memberId,
+        //     partId: partId,
+        //     isDefected: isDefected,
+        //     defectedType: defectedType,
+        //     isFixed: isFixed,
+        //     image: newFileName
+        // }
 
-        const testId = inspection.dataValues.test_id;
-        const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
-        const filePath = inspectionDetails.image;
-        const imageString = await encodeImage(filePath);
+        // const inspection = await inspectionService.createInspection(insertData);
 
-        inspectionDetails.imageStr = imageString;
+        // const testId = inspection.dataValues.test_id;
+        // const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
+        // const filePath = inspectionDetails.image;
+        // const imageString = await encodeImage(filePath);
 
-        return res.send(inspectionDetails);
+        // inspectionDetails.imageStr = imageString;
+
+        // return res.send(inspectionDetails);
     },
 
     getList: async(req, res) => {
@@ -154,7 +156,11 @@ const inspectionController = {
             page: page
         }
 
-        const inspectionList = await inspectionService.retrieveInspectionList(data, sort);
+        const memberType = await inspectionService.selectMemberType(memberId);  //사용자0 담당자1
+
+        let inspectionList;
+        if(memberType == 0) inspectionList = await inspectionService.retrieveInspectionList(data, sort);
+        else if(memberType == 1) inspectionList = await inspectionService.retrieveDefectedList(data, sort);
 
         return res.send(inspectionList);
     },
