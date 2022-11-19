@@ -1,3 +1,4 @@
+const db = require("../models");
 const Test = db.tests;
 const member = require("../models/member");
 const test = require("../models/test");

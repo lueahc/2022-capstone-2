@@ -2,10 +2,10 @@ const Sequelize = require('sequelize');
 module.exports = function(sequelize,DataTypes){
     return sequelize.define('engineer',{
         engineer_id: {
-            autoIncrement: true,
             type: DataTypes.INTEGER,
             allowNull: false,
             primarykey: true,
+            defaultValue : "1",
             comment:"index"
         },
         id:{

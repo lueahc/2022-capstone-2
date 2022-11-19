@@ -2,7 +2,9 @@ const memocontroller = require("../controllers/memocontroller.js");
 
 const memorouter = require("express").Router();
 
-memorouter.post("/addnewmemo",memocontroller.AddNewMemo);
+
+
+memorouter.post("",memocontroller.AddNewMemo);
 
 memorouter.get("/getallmemoes",memocontroller.getAllMemoes);
 

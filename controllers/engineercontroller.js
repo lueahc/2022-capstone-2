@@ -16,12 +16,11 @@ await Engineer.create(info).catch((err)=>console.log(err));
 resData.result = "result : added"
 res.status(201).send(resData);
 };
-
 // const getAllEngineers = async(req,res)=>{ 
 //     let engineer = await Engineer.findAll({}).catch((err)=>console.log(err));
 //     res.status(200).send(engineer);
 // };
-const getEngineer = async(req,res)=>{
+const getEngineer = async(req,res)=>{  //auto increment 1로 초기화 시켜주는 query 추가 
     // resData.result = "result : check input condition"
     // if (!req.params.id) return res.status(404).send(resData)
     const tmp = await Engineer.findOne({
@@ -29,7 +28,11 @@ const getEngineer = async(req,res)=>{
             engineer_id : 1
         },
         raw:true
-    }).catch((err)=>console.log(err));
+    }).catch(
+        (err)=>console.log(err),
+        resData.result = "result : can't find engineer",
+        res.status(404).send(resData)
+     );
     // if (!tmp){
     //     resData.result = "result : engineer not found"
     //     return res.status(404).send(resData);
@@ -48,26 +51,27 @@ const updateEngineer = async(req,res)=>{
     }
     const engineer = await Engineer.findOne({
         where:{
-            id : req.params.id
+            engineer_id : 1
         },
         raw:true
     }).catch((err)=>console.log(err));
-    if (engineer){
-        try{
-            await Engineer.update({name : info.name, hp : info.hp}, {where : {id: req.params.id}}).catch((err)=>console.log(err));
-            resData.result = "result : update complete";
-            return res.status(200).send(resData);}
-            catch(err){
-                resData.result = "result : check conditions";
-                res.status(412).send(resData)
-            }
-        }
-        else{
-            resData.result = "result : user not found"
-            return res.status(404).send(resData)
-        }
+    await engineer.update({name : info.name},{hp:info.hp}).catch((err)=>console.log(err))
+    // if (engineer){
+    //     try{
+    //         await Engineer.update({name : info.name, hp : info.hp}, {where : {engineer_id : 1}}).catch((err)=>console.log(err));
+    //         resData.result = "result : update complete";
+    //         return res.status(200).send(resData);}
+    //         catch(err){
+    //             resData.result = "result : check conditions";
+    //             res.status(412).send(resData)
+    //         }
+    //     }
+    //     else{
+    //         resData.result = "result : user not found"
+    //         return res.status(404).send(resData)
+    //     }
 };
-const deleteengineer = async(req,res)=>{
+const deleteengineer = async(req,res)=>{ //auto increment 1로 초기화 시켜주는 query 추가
     // if (!req.params.id) return res.status(404).send(resData)
     // const engineer = await Engineer.findOne({
     //     where:{

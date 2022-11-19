@@ -2,7 +2,7 @@
 
  const testrouter = require("express").Router();
 
- testrouter.post("/addtest",testcontroller.addNewTest);
+ testrouter.post("",testcontroller.addNewTest);
 
  testrouter.get("/getAllTests",testcontroller.getAllTests);
 

@@ -1,15 +1,15 @@
-const engineercontroller = require("../controllers/engineercontroller.js");
+const engineercontroller = require("../controllers/engineerController.js");
 
 const engineerrouter = require ("express").Router();
 
-//engineerrouter.post("/addengineer",engineercontroller.addnewEngineer);
+engineerrouter.post("/",engineercontroller.addnewEngineer);
 
 //engineerrouter.get("/getallengineers",engineercontroller.getAllEngineers);
 
-//engineerrouter.get("/:id",engineercontroller.getEngineer);
+engineerrouter.get("/",engineercontroller.getEngineer);
 
-engineerrouter.put("/:id",engineercontroller.updateEngineer);
+engineerrouter.put("/",engineercontroller.updateEngineer);
 
-//engineerrouter.delete("/:id",engineercontroller.deleteengineer);
+engineerrouter.delete("/",engineercontroller.deleteengineer);
 
 module.exports = engineerrouter;
