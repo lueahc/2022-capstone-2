@@ -7,5 +7,4 @@ partrouter.get("/getallparts",partcontroller.getallparts);
 partrouter.get("/:part_id",partcontroller.getPart);
 partrouter.put("/:part_id",partcontroller.updatePart);
 partrouter.delete("/:part_id",partcontroller.deletePart);
-partrouter.get("/list",partcontroller.getlist);
 module.exports = partrouter;
