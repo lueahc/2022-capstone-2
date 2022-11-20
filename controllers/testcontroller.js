@@ -22,10 +22,10 @@ const updateTest = async(req,res)=>{
         return res.status(404).send(resData)
     }
     else{
-        if (tmp.isfixed=0){
+        if (tmp.isfixed==0){
             await Test.update({isfixed:1},{where:{test_id:req.params.test_id}}).catch((err)=>console.log(err))
         }
-        else if(tmp.isfixed=1){
+        else if(tmp.isfixed==1){
             await Test.update({isfixed:0},{where:{test_id:req.params.test_id}}).catch((err)=>console.log(err))
         }
         else{
