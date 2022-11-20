@@ -32,7 +32,11 @@ const addnewMember = async(req,res) =>{
         resData.result = "result : user already exists"
         return res.status(412).send(resData);
     }
-    await Member.create(info).catch((err)=>console.log(err));
+    await Member.create(info).catch(
+        (err)=>console.log(err),
+        resData.result = "result : can't add member",
+        res.status(404).send(resData)
+        );
     resData.result = "result : user added"
     res.status(201).send(resData);
 };

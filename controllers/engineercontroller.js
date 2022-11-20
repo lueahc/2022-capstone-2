@@ -47,7 +47,11 @@ const updateEngineer = async(req,res)=>{
     await engineer.update({name : info.name},{hp:info.hp}).catch((err)=>console.log(err))
 };
 const deleteengineer = async(req,res)=>{ 
-    await engineer.destroy({ where : { engineer_id:1}}).catch((err)=>console.log(err));
+    await engineer.destroy({ where : { engineer_id:1}}).catch(
+        (err)=>console.log(err),
+        resData.result = "result : couldn't delete engineer",
+        res.status(404).send(resData)
+        );
     resData.result = "result : engineer deleted"
     res.status(200).send(resData);
 };

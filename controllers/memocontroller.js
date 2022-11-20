@@ -80,21 +80,21 @@ const updateMemo = async(req,res)=>{ //test_id 가 넘어옴 test_id memoindex �
 }
 const deleteMemo = async(req,res)=>{
     resData.result = "result : check input condition"
-    if(!req.params.memo_id) return res.status(404).send(resData);
+    if(!req.params.test_id) return res.status(404).send(resData);
     let memo_id = req.params.memo_id;
-    const tmp = await Memo.findOne({
+    const testfind = await Test.findOne({
         where:{
-            memo_id:req.params.memo_id
+            test_id : req.params.test_id
         },
         raw:true
-    }).catch((err)=>console.log(err));
-    if (!tmp){
-        resData.result = "result : memo doesn't exist"
+    }).catch((err)=>console.log(err),res.status(404).send(resData));
+    if(!testfind){
+        resData.result = "result : test doesn't exist"
         return res.status(404).send(resData);
     }
     const memo = await Memo.destroy({
         where:{
-            memo_id:memo_id
+            memo_id:testfind.memo_id
         },
         raw:true
     }).catch(

@@ -5,7 +5,11 @@ const resData = {
     result : "default"
 }
 const getallparts = async(req,res)=>{
-    let part = await Part.findAll({}).catch((err)=>console.log(err));
+    let part = await Part.findAll({}).catch(
+        (err)=>console.log(err),
+        resData.result = "result : can't find part",
+        res.status(404).send(resData)
+        );
     res.status(200).send(part);
 };
 const updatePart = async(req,res)=>{
@@ -20,7 +24,11 @@ const updatePart = async(req,res)=>{
             part_id : req.params.part_id
         },
         raw:true
-    }).catch((err)=>console.log(err));
+    }).catch(
+        (err)=>console.log(err),
+        resData.result = "result : can't update part",
+        res.status(404).send(resData)
+        );
     if (part){
         try{
             await Part.update({stock:info.stock},{where:{part_id : req.params.part_id}})
