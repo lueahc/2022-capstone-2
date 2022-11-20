@@ -74,6 +74,7 @@ const updatemember = async(req,res)=>{
     if (!req.body.empnum) return res.status(404).send(resData)
     if (!req.body.hp) return res.status(404).send(resData)
     let info = {
+        id : req.body.id,
         type : req.body.type,
         pw : req.body.pw,
         name : req.body.name,

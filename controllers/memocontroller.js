@@ -46,39 +46,14 @@ const AddNewMemo = async(req,res)=>{
         resData.result = "result : test not found"
         return res.status(404).send(resData);
     }
-    await Test.update({memo_id : memo_id },{where:{test_id:test_id}}).catch((err)=>console.log(err));
     resData.result = "result : memo added"
     res.status(201).send(resData);
     }
 };
 
-const getAllMemoes = async(req,res)=>{
-    let memo = await Memo.findAll({}).catch((err)=>console.log(err));
-    res.status(200).send(memo);
-};
-
-const getMemo = async(req,res)=>{
+const updateMemo = async(req,res)=>{ //test_id 가 넘어옴 test_id memoindex 찾아서 memo update 
     resData.result = "result : check input condition"
-    if (!req.param.memo_id) return res.status(404).send(resData)
-    let memo_id = req.params.memo_id;
-    const tmp = await Memo.findOne({
-        where:{
-            memo_id : req.params.memo_id
-        },
-        raw:true
-    }).catch((err)=>console.log(err));
-    if (!tmp){
-        resData.result = "result : memo doesn't exist"
-        return res.status(404).send(resData);
-    }
-    else{
-        let memo = await Memo.findOne({where:{memo_id:memo_id}}).catch((err)=>console.log(err));
-        res.status(200).send(memo);
-    }
-};
-
-const updateMemo = async(req,res)=>{
-    resData.result = "result : check input condition"
+    if (!req.params.test_id) return res.stauts(404).sned(resData)
     if (!req.body.content) return res.status(404).send(resData)
     const content = req.body.content
     var memocheck = /^[0-9a-zA-Z~!@#$%^&*()_+|<>?:{}ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,50}$/;
@@ -87,15 +62,26 @@ const updateMemo = async(req,res)=>{
         resData.result = "result : check input condition"
         return res.status(412).send(resData);
     }
-    const memo = await Memo.update({content : content},{where :{memo_id:req.params.memo_id}}).catch((err)=>console.log(err));
+    const testfind = await Test.findOne({
+        where:{
+            test_id : req.params.test_id
+        },
+        raw:true
+    }).catch((err)=>console.log(err),res.status(404).send(resData));
+    if(!testfind){
+        resData.result="result : test doesn't exist"
+        return res.status(404).send(resData);
+    }
+    else{
+    const memo = await Memo.update({content : content},{where :{memo_id:testfind.memo_id}}).catch((err)=>console.log(err));
     resData.result = "result : memo updated"
     res.status(200).send(resData);
-};
+    }
+}
 const deleteMemo = async(req,res)=>{
     resData.result = "result : check input condition"
     if(!req.params.memo_id) return res.status(404).send(resData);
     let memo_id = req.params.memo_id;
-    //await memo.destroy({where: { memo_id:memo_id}}).catch((err)=>console.log(err));
     const tmp = await Memo.findOne({
         where:{
             memo_id:req.params.memo_id
@@ -111,23 +97,17 @@ const deleteMemo = async(req,res)=>{
             memo_id:memo_id
         },
         raw:true
-    }).catch(error=>console.log(error));
+    }).catch(
+        error=>console.log(error),
+        resData.result ="result : can't delete memo",
+        res.status(404).send(resData)
+    ); // return res.send 더하기 
     resData.result = "result : memo deleted"
     res.status(200).send(resData);
 };
-/*const memotest = async(req,res)=>{
-    let result = req.body.test;
-    console.log(result);
-    const resData = {
-        result: 'dskaf;jaeojwj'
-    }
-    return res.status(200).send(resData);
-};*/
+
 module.exports = {
     AddNewMemo,
-    getAllMemoes,
-    getMemo,
     updateMemo,
-    deleteMemo,
-    //memotest
+    deleteMemo
 }

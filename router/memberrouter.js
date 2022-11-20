@@ -1,8 +1,8 @@
-const membercontroller = require("../controllers/membercontroller.js");
+const membercontroller = require("../controllers/memberController.js");
 
 const memberrouter = require("express").Router();
 
-memberrouter.post("",membercontroller.addnewMember);
+memberrouter.post("/",membercontroller.addnewMember);
 
 memberrouter.get("/getallmembers", membercontroller.getAllmembers);
 

@@ -5,17 +5,17 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-const memorouter = require("./router/memorouter.js");
-const engineerrouter = require ("./router/engineerrouter.js");
-const memberrouter = require("./router/memberrouter.js");
-const partrouter = require("./router/partrouter.js");
-const testrouter = require("./router/testrouter.js");
+const memorouter = require("./router/memoRouter.js");
+const engineerrouter = require ("./router/engineerRouter.js");
+const memberrouter = require("./router/memberRouter.js");
+const partrouter = require("./router/partRouter.js");
+const testrouter = require("./router/testRouter.js");
 
 //app.use("/api", router);
 
-app.use("/user/engineer",engineerrouter);
+app.use("/engineer",engineerrouter);
 app.use("/member",memberrouter);
-app.use("/user/memo",memorouter);
+app.use("/memo",memorouter);
 app.use("/part",partrouter);
 app.use("/test",testrouter);
 
