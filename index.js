@@ -6,8 +6,12 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
 
-const inspectionRouter = require('./src/routes/inspectionRouter');
 const authRouter = require('./src/routes/authRouter');
+const inspectionRouter = require('./src/routes/inspectionRouter');
+const engineerRouter = require('./src/routes/engineerRouter');
+const memoRouter = require('./src/routes/memoRouter');
+const partRouter = require('./src/routes/partRouter');
+const fixRouter = require('./src/routes/fixRouter');
 
 const { sequelize } = require('./models');
 
@@ -41,8 +45,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 //라우터
-app.use('/inspection', inspectionRouter);
 app.use('/auth', authRouter);
+app.use('/inspection', inspectionRouter);
+app.use('/engineer', engineerRouter);
+app.use('/memo', memoRouter);
+app.use('/part', partRouter);
+app.use('/fix', fixRouter);
 
 app.get('/', (req, res) => {res.send('SERVER 연결');});
 app.listen(PORT, () => {console.log(`listening on ${PORT}`);});
