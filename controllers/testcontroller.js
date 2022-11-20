@@ -11,14 +11,6 @@ const resData = {
 const updateTest = async(req,res)=>{
     resData.result = "result : check input condition"
     if(!req.params.test_id) return res.status(404).send(resData)
-    if(!req.body.isdefected) return res.status(404).send(resData)
-    // if(!req.body.defected_id) return res.status(404).send(resData)
-    if(!req.body.isfixed) return res.status(404).send(resData)
-    const info = {
-        isdefected : req.body.isdefected,
-        defected_id : req.body.defected_id,
-        isfixed : req.body.isfixed
-    }
     const tmp = await Test.findOne({
         where:{
             test_id : req.params.test_id
@@ -30,7 +22,16 @@ const updateTest = async(req,res)=>{
         return res.status(404).send(resData)
     }
     else{
-        await Test.update(req.body,{where:{test_id:req.params.test_id}})
+        if (tmp.isfixed=0){
+            await Test.update({isfixed:1},{where:{test_id:req.params.test_id}}).catch((err)=>console.log(err))
+        }
+        else if(tmp.isfixed=1){
+            await Test.update({isfixed:0},{where:{test_id:req.params.test_id}}).catch((err)=>console.log(err))
+        }
+        else{
+            resData.result = "result : invalid isfixed state"
+            return res.status(404).send(resData.result)
+        }
         resData.result = "result : update complete"
         return res.status(200).send(resData)
     }
