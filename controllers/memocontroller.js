@@ -45,6 +45,9 @@ const AddNewMemo = async(req,res)=>{
         resData.result = "result : test not found"
         return res.status(404).send(resData);
     }
+    else{
+        Test.update({memo_id:memo.memo_id},{where:{test_id:test.test_id}}).catch((err)=>console.log(err));
+    }
     resData.result = "result : memo added"
     res.status(201).send(resData);
     }
