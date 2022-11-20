@@ -33,9 +33,7 @@ const addnewMember = async(req,res) =>{
         return res.status(412).send(resData);
     }
     await Member.create(info).catch(
-        (err)=>console.log(err),
-        resData.result = "result : can't add member",
-        res.status(404).send(resData)
+        (err)=>console.log(err)
         );
     resData.result = "result : user added"
     res.status(201).send(resData);
@@ -52,7 +50,6 @@ const getMember = async(req,res)=>{
         resData.result = "result : check input condition"
         return res.status(404).send(resData)
     }
-    let id = req.params.id;
     const tmp = await Member.findOne({
         where:{
             id:req.params.id
@@ -93,7 +90,7 @@ const updatemember = async(req,res)=>{
     }).catch((err)=>console.log(err));
     if(member){
         try{
-            await Member.update({type:info.type,pw :info.pw,name:info.name,empnum:info.empnum,hp:info.hp}, { where : {member_id : member.member_id}})
+            await Member.update({id:info.id,type:info.type,pw :info.pw,name:info.name,empnum:info.empnum,hp:info.hp}, { where : {member_id : member.member_id}})
             resData.result = "result : update complete"
             return res.status(200).send(resData);
         }

@@ -22,11 +22,6 @@ module.exports = function(sequelize, DataTypes) {
         key: 'member_id'
       }
     },
-    created_at:{
-      type:DataTypes.DATE,
-      allowNull:false,
-      comment:"최초작성일"
-    },
     updated_at:{
       type:DataTypes.DATE,
       allowNull:true,

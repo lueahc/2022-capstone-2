@@ -11,14 +11,18 @@ const addnewEngineer = async (req,res) =>{
     let info =  {
     name : req.body.name,
     hp : req.body.hp,
-};
-await Engineer.create(info).catch((err)=>console.log(err));
-resData.result = "result : added"
-res.status(201).send(resData);
+    };
+    await Engineer.create(info).catch(
+        (err)=>console.log(err),
+        // resData.result = "result : can't add engineer",
+        // res.status(404).send(resData)
+        );
+    resData.result = "result : added";
+    res.status(201).send(resData);
 };
 const getEngineer = async(req,res)=>{  //default : 1 
     resData.result = "result : check input condition"
-    if (!req.params.id) return res.status(404).send(resData)
+    if (!req.params.engineer_id) return res.status(404).send(resData)
     const tmp = await Engineer.findOne({
         where:{
             engineer_id : 1
@@ -38,19 +42,11 @@ const updateEngineer = async(req,res)=>{
         name : req.body.name,
         hp : req.body.hp
     }
-    const engineer = await Engineer.findOne({
-        where:{
-            engineer_id : 1
-        },
-        raw:true
-    }).catch((err)=>console.log(err));
-    await engineer.update({name : info.name},{hp:info.hp}).catch((err)=>console.log(err))
+    await Engineer.update({name : info.name,hp:info.hp},{where: {engineer_id : 1}}).catch((err)=>console.log(err))
 };
 const deleteengineer = async(req,res)=>{ 
-    await engineer.destroy({ where : { engineer_id:1}}).catch(
-        (err)=>console.log(err),
-        resData.result = "result : couldn't delete engineer",
-        res.status(404).send(resData)
+    await Engineer.destroy({ where : { engineer_id:1}}).catch(
+        (err)=>console.log(err)
         );
     resData.result = "result : engineer deleted"
     res.status(200).send(resData);

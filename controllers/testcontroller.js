@@ -12,7 +12,7 @@ const updateTest = async(req,res)=>{
     resData.result = "result : check input condition"
     if(!req.params.test_id) return res.status(404).send(resData)
     if(!req.body.isdefected) return res.status(404).send(resData)
-    if(!req.body.defected_id) return res.status(404).send(resData)
+    // if(!req.body.defected_id) return res.status(404).send(resData)
     if(!req.body.isfixed) return res.status(404).send(resData)
     const info = {
         isdefected : req.body.isdefected,
@@ -37,4 +37,4 @@ const updateTest = async(req,res)=>{
 }
 module.exports = {
     updateTest,
-}
+};

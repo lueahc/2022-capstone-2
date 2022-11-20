@@ -3,17 +3,10 @@ module.exports = function(sequelize,DataTypes){
     return sequelize.define('engineer',{
         engineer_id: {
             type: DataTypes.INTEGER,
+            defaultValue: 1,
             allowNull: false,
-            primarykey: true,
-            defaultValue : "1",
+            primaryKey: true,
             comment:"index"
-        },
-        id:{
-            type :DataTypes.STRING(500),
-            allowNull:false,
-            primaryKey:true,
-            comment:"아이디",
-            unique:"id"
         },
         name:{
             type:DataTypes.STRING(500),
@@ -29,7 +22,6 @@ module.exports = function(sequelize,DataTypes){
         sequelize,
         tableName:'engineer',
         timestamps:false,
-        paranoid:true,
         indexes:[
             {
                 name:"PRIMARY",
@@ -39,14 +31,6 @@ module.exports = function(sequelize,DataTypes){
                     {name : "engineer_id"},
                 ]
             },
-            {
-                name: "id",
-                unique: true,
-                using: "BTREE",
-                fields: [
-                  { name: "id" },
-                ]
-              },
         ]
-    })
-}
+    });
+};

@@ -6,9 +6,7 @@ const resData = {
 }
 const getallparts = async(req,res)=>{
     let part = await Part.findAll({}).catch(
-        (err)=>console.log(err),
-        resData.result = "result : can't find part",
-        res.status(404).send(resData)
+        (err)=>console.log(err)
         );
     res.status(200).send(part);
 };
@@ -25,9 +23,7 @@ const updatePart = async(req,res)=>{
         },
         raw:true
     }).catch(
-        (err)=>console.log(err),
-        resData.result = "result : can't update part",
-        res.status(404).send(resData)
+        (err)=>console.log(err)
         );
     if (part){
         try{

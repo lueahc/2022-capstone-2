@@ -3,11 +3,10 @@ const member = require("../models/member");
 const memo = require("../models/memo");
 const Memo = db.memoes;
 const test = require("../models/test");
-const Test = db.testes;
+const Test = db.tests;
 const resData = {
     result :"default"
 }
-
 const AddNewMemo = async(req,res)=>{
     resData.result = "result : check input condition"
     if (!req.body.content) return res.status(404).send(resData)
@@ -67,7 +66,7 @@ const updateMemo = async(req,res)=>{ //test_id 가 넘어옴 test_id memoindex �
             test_id : req.params.test_id
         },
         raw:true
-    }).catch((err)=>console.log(err),res.status(404).send(resData));
+    }).catch((err)=>console.log(err));
     if(!testfind){
         resData.result="result : test doesn't exist"
         return res.status(404).send(resData);
@@ -87,20 +86,19 @@ const deleteMemo = async(req,res)=>{
             test_id : req.params.test_id
         },
         raw:true
-    }).catch((err)=>console.log(err),res.status(404).send(resData));
+    }).catch((err)=>console.log(err));
     if(!testfind){
         resData.result = "result : test doesn't exist"
         return res.status(404).send(resData);
     }
+    await Test.update({memo_id :null},{where:{test_id:testfind.test_id}}).catch((err)=>console.log(err))
     const memo = await Memo.destroy({
         where:{
             memo_id:testfind.memo_id
         },
         raw:true
     }).catch(
-        error=>console.log(error),
-        resData.result ="result : can't delete memo",
-        res.status(404).send(resData)
+        error=>console.log(error)
     ); // return res.send 더하기 
     resData.result = "result : memo deleted"
     res.status(200).send(resData);
