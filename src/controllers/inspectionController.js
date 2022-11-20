@@ -46,6 +46,7 @@ async function encodeImage(path) {
     imageToBase64(path) //인코딩
     .then(
         (response) => {
+            console.log(response);
             // const output = Date.now() + "output.txt"
             // fs.writeFileSync(output, response);
             // res.download(output);
@@ -60,7 +61,17 @@ async function encodeImage(path) {
 }
 
 const inspectionController = {
-    test: async(req, res) => {
+    test: async (req, res) => {
+        // const content = 'Hello World';
+        // fs.writeFile('images/after/test.txt', content, err => {
+        //     if (err) { }
+        //     return res.send(content)
+        // })
+
+        // fs.readFile('images/after/test.txt', 'utf8', (err, data) => {
+        //     if (err) { }
+        //     return res.send(data)
+        // })        
     },
 
     toFlask: async (req, res, next) => {
@@ -92,46 +103,44 @@ const inspectionController = {
     toAndroid: async(req, res) => {
         console.log(req.modelData);
 
-        // //이미지 디코딩 후 저장
-        // const imageStr = req.modelData.res_json['img']['0'];
-        // const imageBuffer = await decodeImage(imageStr);
-        // const newFileName = `images/after/${Date.now()}.jpg`;
+        //이미지 디코딩 후 저장
+        const imageStr = req.modelData['img']['0'];
+        const imageBuffer = await decodeImage(imageStr);
+        const newFileName = `images/after/${Date.now()}.jpg`;
 
-        // fs.writeFile(newFileName, imageBuffer.data, err => {})
+        fs.writeFile(newFileName, imageBuffer.data, err => {})
 
-        // const memberId = req.memberId;  //tester_id
-        // const defectedType = req.modelData.res_json['name']['0'];   //defectedType
-        // let isDefected, isFixed;    //isdefected, isfixed
-        // if(defectedType == null) {
-        //     isDefected = 0;
-        //     isFixed = null;
-        // } else {
-        //     isDefected = 1;
-        //     isFixed = 0
-        // }
-        // const partId = await inspectionService.findPart(defectedType);  //part_id
+        const memberId = req.memberId;  //tester_id
+        const defectedType = req.modelData['name']['0'];   //defectedType
+        let isDefected, isFixed;    //isdefected, isfixed
+        if(defectedType == null) {
+            isDefected = 0;
+            isFixed = null;
+        } else {
+            isDefected = 1;
+            isFixed = 0
+        }
+        const partId = await inspectionService.findPart(defectedType);  //part_id
 
-        // if(!imageStr) return res.send('IMAGE_EMPTY');
+        if(!imageStr) return res.send('IMAGE_EMPTY');
 
-        // const insertData = {
-        //     testerId: memberId,
-        //     partId: partId,
-        //     isDefected: isDefected,
-        //     defectedType: defectedType,
-        //     isFixed: isFixed,
-        //     image: newFileName
-        // }
+        const insertData = {
+            testerId: memberId,
+            partId: partId,
+            isDefected: isDefected,
+            defectedType: defectedType,
+            isFixed: isFixed,
+            image: newFileName
+        }
 
-        // const inspection = await inspectionService.createInspection(insertData);
+        const inspection = await inspectionService.createInspection(insertData);
 
-        // const testId = inspection.dataValues.test_id;
-        // const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
-        // const filePath = inspectionDetails.image;
-        // const imageString = await encodeImage(filePath);
+        const testId = inspection.dataValues.test_id;
+        const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
 
-        // inspectionDetails.imageStr = imageString;
+        inspectionDetails.imageStr = imageStr;
 
-        // return res.send(inspectionDetails);
+        return res.send(inspectionDetails);
     },
 
     getList: async(req, res) => {
@@ -168,12 +177,20 @@ const inspectionController = {
         const testId = req.params.testId;
 
         const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
-        const filePath = inspectionDetails.image;
-        const imageString = await encodeImage(filePath);
+        const filePath = inspectionDetails.result.image;
 
-        inspectionDetails.imageStr = imageString;
-
-        return res.send(inspectionDetails);
+        imageToBase64(filePath) //인코딩
+        .then(
+            (response) => {
+                inspectionDetails.imageStr = response;
+                return res.send(inspectionDetails);
+            }
+        )
+        .catch(
+            (error) => {
+                console.log(error);
+            }
+        )        
     }
 }
 

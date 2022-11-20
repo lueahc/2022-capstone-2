@@ -102,7 +102,11 @@ const inspectionService = {
 
         connection.release();
 
-        return inspectionDetails[0];
+        const resData = {
+            result: inspectionDetails[0]
+        }
+
+        return resData;
     },
 
     retrieveDefectedList: async(data, sort) => {
