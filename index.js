@@ -1,32 +1,55 @@
-const express = require("express");
-const cors = require("cors");
+const express = require('express');
 const app = express();
 
+const passport = require('passport');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const { sequelize } = require('./models');
+require('dotenv').config();
+
+const authRouter = require('./src/routes/authRouter');
+const inspectionRouter = require('./src/routes/inspectionRouter');
+const engineerRouter = require('./src/routes/engineerRouter');
+const memoRouter = require('./src/routes/memoRouter');
+const partRouter = require('./src/routes/partRouter');
+const fixRouter = require('./src/routes/fixRouter');
+
+const PORT = process.env.PORT || 3000;
+
+//sequelize
+sequelize.sync({ force: false })
+    .then(() => {
+        console.log('DB 연결');
+    })
+    .catch((err) => {
+        console.error(err);
+    });
+
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
-const memorouter = require("./router/memorouter.js");
-const engineerrouter = require ("./router/engineerrouter.js");
-const memberrouter = require("./router/memberrouter.js");
-const partrouter = require("./router/partrouter.js");
-const testrouter = require("./router/testrouter.js");
+//session
+app.use(session({
+    resave: false,
+    saveUninitialized: false,
+    secret: process.env.COOKIE_SECRET,
+    cookie: {
+        httpOnly: true,
+        secure: false,
+    },
+}));
 
-//app.use("/api", router);
+//passport
+app.use(passport.initialize());
+app.use(passport.session());
 
-app.use("/user/engineer",engineerrouter);
-app.use("/member",memberrouter);
-app.use("/user/memo",memorouter);
-app.use("/part",partrouter);
-app.use("/test",testrouter);
+//routes
+app.use('/auth', authRouter);
+app.use('/inspection', inspectionRouter);
+app.use('/engineer', engineerRouter);
+app.use('/memo', memoRouter);
+app.use('/part', partRouter);
+app.use('/fix', fixRouter);
 
-app.listen(1212), () => {
-  console.log(app.get(3306), "번 포트에서 대기 중");
-};
-
-module.exports = partrouter;
-module.exports = engineerrouter;
-module.exports = memorouter;
-module.exports = memberrouter;
-module.exports = testrouter;
-
-///user/memo/test///
+app.get('/', (req, res) => { res.send('SERVER 연결'); });
+app.listen(PORT, () => { console.log(`listening on ${PORT}`); });

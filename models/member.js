@@ -6,7 +6,7 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      comment: "ID"
+      comment: "idx"
     },
     id: {
       type: DataTypes.STRING(500),
@@ -14,37 +14,25 @@ module.exports = function(sequelize, DataTypes) {
       comment: "아이디",
       unique: "id"
     },
-    pw:{
-      type:DataTypes.INTEGER,
-      allowNull:false,
-      primaryKey:true,
-      comment:"비밀번호"
-    },
     type: {
       type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: 0,
-      comment: "회원유형"
+      comment: "유형"
     },
     name: {
       type: DataTypes.STRING(20),
       allowNull: false,
-      comment: "회원이름"
+      comment: "이름"
     },
-    empnum: {
+    emp_num: {
       type: DataTypes.INTEGER,
       allowNull: false,
       comment: "사원번호"
     },
-    hp: {
+    phone_num: {
       type: DataTypes.STRING(20),
       allowNull: true,
       comment: "전화번호"
-    },
-    deleted_at: {
-      type: DataTypes.DATE,
-      allowNull: true,
-      comment: "탈퇴일"
     }
   }, {
     sequelize,
