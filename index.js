@@ -4,6 +4,7 @@ const app = express();
 const passport = require('passport');
 const session = require('express-session');
 const cookieParser = require('cookie-parser');
+const { sequelize } = require('./models');
 require('dotenv').config();
 
 const authRouter = require('./src/routes/authRouter');
@@ -12,8 +13,6 @@ const engineerRouter = require('./src/routes/engineerRouter');
 const memoRouter = require('./src/routes/memoRouter');
 const partRouter = require('./src/routes/partRouter');
 const fixRouter = require('./src/routes/fixRouter');
-
-const { sequelize } = require('./models');
 
 const PORT = process.env.PORT || 3000;
 
@@ -29,7 +28,7 @@ sequelize.sync({ force: false })
 app.use(express.json());
 app.use(cookieParser());
 
-//세션
+//session
 app.use(session({
     resave: false,
     saveUninitialized: false,
@@ -44,7 +43,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-//라우터
+//routes
 app.use('/auth', authRouter);
 app.use('/inspection', inspectionRouter);
 app.use('/engineer', engineerRouter);
@@ -52,5 +51,5 @@ app.use('/memo', memoRouter);
 app.use('/part', partRouter);
 app.use('/fix', fixRouter);
 
-app.get('/', (req, res) => {res.send('SERVER 연결');});
-app.listen(PORT, () => {console.log(`listening on ${PORT}`);});
+app.get('/', (req, res) => { res.send('SERVER 연결'); });
+app.listen(PORT, () => { console.log(`listening on ${PORT}`); });

@@ -5,10 +5,13 @@ const resData = {
     result: "default"
 }
 
-const addNewEngineer = async (req, res) => {
+const addnewEngineer = async (req, res) => {
     resData.result = "result : check input condition"
     if (!req.body.name) return res.status(412).send(resData)
     if (!req.body.hp) return res.status(412).send(resData)
+
+    var phoneNumChk = /\d{3}-\d{4}-\d{4}/;
+    if (!phoneNumChk.test(req.body.hp)) return res.status(400).send('REGEX_ERROR');
 
     let info = {
         name: req.body.name,
@@ -17,14 +20,14 @@ const addNewEngineer = async (req, res) => {
 
     await Engineer.create(info).catch((err) => {
         console.log(err)
-        return res.send(resData);
+        return res.status(400).send(resData);
     }
         // resData.result = "result : can't add engineer",
         // res.status(404).send(resData)
     );
 
     resData.result = "result : added";
-    return res.status(201).send(resData);
+    return res.send(resData);
 };
 
 const getEngineer = async (req, res) => {  //default : 1 
@@ -38,55 +41,48 @@ const getEngineer = async (req, res) => {  //default : 1
     }).catch((err) => {
         console.log(err)
         resData.result = "result : can't find engineer"
-        res.status(404).send(resData)
+        return res.status(404).send(resData)
     }
     );
 
-    return res.status(200).send(tmp);
+    return res.send(tmp);
 };
 
 const updateEngineer = async (req, res) => {
     if (!req.body.name) return res.status(404).send(resData)
     if (!req.body.hp) return res.status(404).send(resData)
 
+    var phoneNumChk = /\d{3}-\d{4}-\d{4}/;
+    if (!phoneNumChk.test(req.body.hp)) return res.status(400).send('REGEX_ERROR');
+
     const info = {
         name: req.body.name,
         hp: req.body.hp
     }
 
-    await Engineer.update({
-        name: info.name,
-        hp: info.hp
-    }, {
-        where: {
-            engineer_id: 1
-        }
-    }).catch((err) => {
-        console.log(err)
-        return res.send(resData);
-    })
+    await Engineer.update({ name: info.name, hp: info.hp }, { where: { engineer_id: 1 } })
+        .catch((err) => {
+            console.log(err)
+            return res.status(400).send(resData);
+        })
 
     return res.send(resData);
 };
 
-const deleteEngineer = async (req, res) => {
-    await Engineer.destroy({
-        where: {
-            engineer_id: 1
-        }
-    }).catch((err) => {
-        console.log(err);
-        return res.send(resData);
-    }
-    );
+const deleteengineer = async (req, res) => {
+    await Engineer.destroy({ where: { engineer_id: 1 } })
+        .catch((err) => {
+            console.log(err);
+            return res.status(400).send(resData);
+        });
 
     resData.result = "result : engineer deleted"
-    return res.status(200).send(resData);
+    return res.send(resData);
 };
 
 module.exports = {
-    addNewEngineer,
+    addnewEngineer,
     getEngineer,
     updateEngineer,
-    deleteEngineer,
+    deleteengineer,
 }

@@ -44,20 +44,20 @@ async function decodeImage(string) {
 
 async function encodeImage(path) {
     imageToBase64(path) //인코딩
-    .then(
-        (response) => {
-            console.log(response);
-            // const output = Date.now() + "output.txt"
-            // fs.writeFileSync(output, response);
-            // res.download(output);
-            return response;
-        }
-    )
-    .catch(
-        (error) => {
-            console.log(error);
-        }
-    )
+        .then(
+            (response) => {
+                // const output = Date.now() + "output.txt"
+                // fs.writeFileSync(output, response);
+                // res.download(output);
+                return response;
+            }
+        )
+        .catch(
+            (error) => {
+                console.log(error);
+                throw error;
+            }
+        )
 }
 
 const inspectionController = {
@@ -71,15 +71,13 @@ const inspectionController = {
         // fs.readFile('images/after/test.txt', 'utf8', (err, data) => {
         //     if (err) { }
         //     return res.send(data)
-        // })        
+        // })
     },
 
     toFlask: async (req, res, next) => {
         upload(req, res, err => {
-            if (!req.file)
-                return res.send('IMAGE_EMPTY');
-            if (req.fileValidationError == 'error')
-                return res.send('IMAGE_UPLOAD_ERROR');
+            if (!req.file) return res.status(400).send('IMAGE_EMPTY');
+            if (req.fileValidationError == 'error') return res.status(400).send('IMAGE_UPLOAD_ERROR');
 
             const filename = `images/before/${req.file.filename}`;
             const formData = new FormData();
@@ -92,71 +90,75 @@ const inspectionController = {
                     'Content-Type': 'multipart/form-data; boundary=' + formData.getBoundary()
                 },
                 data: formData
+            }).then(response => {
+                req.modelData = response.data;
+                next();
             })
-                .then(response => {
-                    req.modelData = response.data;
-                    next();
-                })
         })
     },
 
-    toAndroid: async(req, res) => {
-        console.log(req.modelData);
-
-        //이미지 디코딩 후 저장
-        const imageStr = req.modelData['img']['0'];
-        const imageBuffer = await decodeImage(imageStr);
-        const newFileName = `images/after/${Date.now()}.jpg`;
-
-        fs.writeFile(newFileName, imageBuffer.data, err => {})
-
+    toAndroid: async (req, res) => {
         const memberId = req.memberId;  //tester_id
-        const defectedType = req.modelData['name']['0'];   //defectedType
-        let isDefected, isFixed;    //isdefected, isfixed
-        if(defectedType == null) {
+        const imageStr = req.modelData['img'];
+        const resultType = req.modelData['type'];   //'불량품' '정상품'
+        const defectedType = req.modelData['name'];   //불량유형 defected_type
+        const partName = req.modelData['part'];
+        let isDefected, isFixed;    //is_defected, is_fixed
+
+        if (!imageStr) return res.status(400).send('IMAGE_EMPTY');
+
+        if (resultType == '불량품') {
+            isDefected = 1;
+            isFixed = 0;
+        } else {
             isDefected = 0;
             isFixed = null;
-        } else {
-            isDefected = 1;
-            isFixed = 0
-        }
-        const partId = await inspectionService.findPart(defectedType);  //part_id
-
-        if(!imageStr) return res.send('IMAGE_EMPTY');
-
-        const insertData = {
-            testerId: memberId,
-            partId: partId,
-            isDefected: isDefected,
-            defectedType: defectedType,
-            isFixed: isFixed,
-            image: newFileName
         }
 
-        const inspection = await inspectionService.createInspection(insertData);
+        //이미지 디코딩 후 저장
+        const imageBuffer = await decodeImage(imageStr);
+        const newFileName = `images/after/${Date.now()}.jpg`;
+        fs.writeFile(newFileName, imageBuffer.data, err => { })
 
-        const testId = inspection.dataValues.test_id;
-        const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
+        try {
+            const partId = await inspectionService.findPart(partName);  //part_id            
 
-        inspectionDetails.imageStr = imageStr;
+            const insertData = {
+                testerId: memberId,
+                partId: partId,
+                isDefected: isDefected,
+                defectedType: defectedType,
+                isFixed: isFixed,
+                image: newFileName
+            }
 
-        return res.send(inspectionDetails);
+            const inspection = await inspectionService.createInspection(insertData);
+
+            const testId = inspection.dataValues.test_id;
+            const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
+
+            inspectionDetails.imageStr = imageStr;
+
+            return res.send(inspectionDetails);
+        } catch (err) {
+            console.log(err);
+            return res.status(400).send('ERROR');
+        }
     },
 
-    getList: async(req, res) => {
-        //FIXME: const memberId = req.memberId;
-        const memberId = 3;
+    getList: async (req, res) => {
+        const memberId = req.memberId;
         const memberType = req.memberType;  //사용자0 담당자1
         const part = req.query.part;
         const result = req.query.result;
         const pageInfo = req.query.page;
         const page = parseInt(pageInfo);
 
-        if(!pageInfo) return res.send('PAGE_EMPTY');
+        if (!pageInfo) return res.status(400).send('PAGE_EMPTY');
 
-        if(!part && !result) sort = 'all';
-        else if(!result) sort = 'part';
-        else if(!part) sort = 'result'
+        if (!part && !result) sort = 'all';
+        else if (!result) sort = 'part';
+        else if (!part) sort = 'result'
         else sort = 'both';
 
         const data = {
@@ -166,31 +168,37 @@ const inspectionController = {
             page: page
         }
 
-        let inspectionList;
-        if(memberType == 0) inspectionList = await inspectionService.retrieveInspectionList(data, sort);
-        else if(memberType == 1) inspectionList = await inspectionService.retrieveDefectedList(data, sort);
+        try {
+            let inspectionList;
+            if (memberType == 0) inspectionList = await inspectionService.retrieveInspectionList(data, sort);
+            else if (memberType == 1) inspectionList = await inspectionService.retrieveDefectedList(data, sort);
 
-        return res.send(inspectionList);
+            return res.send(inspectionList);
+        } catch (err) {
+            console.log(err);
+            return res.status(400).send('ERROR');
+        }
     },
 
-    getListById: async(req, res) => {
+    getListById: async (req, res) => {
         const testId = req.params.testId;
 
         const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
         const filePath = inspectionDetails.result.image;
 
         imageToBase64(filePath) //인코딩
-        .then(
-            (response) => {
-                inspectionDetails.imageStr = response;
-                return res.send(inspectionDetails);
-            }
-        )
-        .catch(
-            (error) => {
-                console.log(error);
-            }
-        )        
+            .then(
+                (response) => {
+                    inspectionDetails.imageStr = response;
+                    return res.send(inspectionDetails);
+                }
+            )
+            .catch(
+                (error) => {
+                    console.log(error);
+                    return res.status(400).send('IMAGE_ENCODING_ERROR');
+                }
+            )
     }
 }
 

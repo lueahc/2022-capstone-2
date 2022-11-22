@@ -1,8 +1,9 @@
-const memoController = require("../controllers/memoController.js");
-const memoRouter = require("express").Router();
+const memocontroller = require("../controllers/memoController.js");
+const memorouter = require("express").Router();
+const jwtMiddleware = require('../middlewares/jwtMiddleware');
 
-memoRouter.post("/", memoController.addNewMemo);
-memoRouter.put("/:test_id", memoController.updateMemo);
-memoRouter.delete("/:test_id", memoController.deleteMemo);
+memorouter.post("/", jwtMiddleware.verifyToken, memocontroller.AddNewMemo);
+memorouter.put("/:test_id", jwtMiddleware.verifyToken, memocontroller.updateMemo);
+memorouter.delete("/:test_id", jwtMiddleware.verifyToken, memocontroller.deleteMemo);
 
-module.exports = memoRouter;
+module.exports = memorouter;

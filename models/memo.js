@@ -6,17 +6,17 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      comment: "메모ID"
+      comment: "idx"
     },
     content: {
       type: DataTypes.STRING(50),
       allowNull: false,
-      comment: "메모내용"
+      comment: "내용"
     },
     writer_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: "작성자ID",
+      comment: "작성자idx",
       references: {
         model: 'member',
         key: 'member_id'

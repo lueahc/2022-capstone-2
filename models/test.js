@@ -6,12 +6,12 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
-      comment: "검사ID"
+      comment: "idx"
     },
     tester_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      comment: "검사자ID",
+      comment: "검사자idx",
       references: {
         model: 'member',
         key: 'member_id'
@@ -19,24 +19,24 @@ module.exports = function(sequelize, DataTypes) {
     },
     part_id: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      comment: "검사부품ID",
+      allowNull: true,
+      comment: "부품idx",
       references: {
         model: 'part',
         key: 'part_id'
       }
     },
-    isdefected: {
+    is_defected: {
       type: DataTypes.TINYINT,
       allowNull: false,
       comment: "불량여부"
     },
-    defectedType: {
+    defected_type: {
       type: DataTypes.STRING(50),
       allowNull: true,
-      comment: "불량유형",
+      comment: "불량유형"
     },
-    isfixed: {
+    is_fixed: {
       type: DataTypes.TINYINT,
       allowNull: true,
       comment: "조치여부"
@@ -44,17 +44,16 @@ module.exports = function(sequelize, DataTypes) {
     memo_id: {
       type: DataTypes.INTEGER,
       allowNull: true,
-      comment: "메모ID",
+      comment: "메모idx",
       references: {
         model: 'memo',
         key: 'memo_id'
       }
     },
-    image: {
+    image_url: {
       type: DataTypes.STRING(200),
       allowNull: false,
-      defaultValue: "",
-      comment: "이미지",
+      comment: "이미지경로"
     }
   }, {
     sequelize,

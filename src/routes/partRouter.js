@@ -1,7 +1,8 @@
-const partController = require("../controllers/partController.js");
-const partRouter = require("express").Router();
+const partcontroller = require("../controllers/partController.js");
+const partrouter = require("express").Router();
+const jwtMiddleware = require('../middlewares/jwtMiddleware');
 
-partRouter.get("/getallparts", partController.getAllParts);
-partRouter.put("/:part_id", partController.updatePart);
+partrouter.get("/getallparts", jwtMiddleware.verifyToken, partcontroller.getallparts);
+partrouter.put("/:part_id", jwtMiddleware.verifyToken, partcontroller.updatePart);
 
-module.exports = partRouter;
+module.exports = partrouter;
