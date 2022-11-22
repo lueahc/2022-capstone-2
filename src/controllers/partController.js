@@ -47,7 +47,7 @@ const updatePart = async (req, res) => {
         else {
             resData.result = "result : part not found"
         }
-        
+
         return res.send(resData);
     } catch (err) {
         resData.result = "result : check input condition"
