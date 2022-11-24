@@ -1,4 +1,4 @@
-const { member, sequelize } = require('../../models');
+const { member, Sequelize, sequelize } = require('../../models');
 const axios = require('axios');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -71,14 +71,11 @@ const authService = {
     },
 
     deleteMember: async (memberId) => {
-        const memberResult = await member.update(
-            { deleted_at: sequelize.literal('now()') },
-            { where: { member_id: memberId } }
-        ).catch((err) => {
-            console.log(err);
-            return err;
-        })
-
+        const memberResult = await sequelize.query('UPDATE `member` SET `deleted_at` = NOW() WHERE `member_id` = :memberid',
+        {
+            replacements : {memberid: memberId},
+        }
+        )
         return memberResult;
     }
 }
