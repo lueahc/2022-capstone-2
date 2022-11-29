@@ -21,7 +21,7 @@ const AddNewMemo = async (req, res) => {
 
     try {
         const str = req.body.content;
-        var memocheck = /^[0-9a-zA-Z~!@#$%^&*()_+|<>?\:{}ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,50}$/;
+        var memocheck = /^[0-9a-zA-Z~!@#$%^&*()_+|<>?\s:{}ㄱ-ㅎ|ㅏ-ㅣ|가-힣]{1,50}$/;
         if (!memocheck.test(str)) {
             resData.result = "result : check input condition"
             return res.status(412).send(resData);
