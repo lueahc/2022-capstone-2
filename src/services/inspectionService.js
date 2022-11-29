@@ -60,8 +60,8 @@ const inspectionService = {
 
         try {
             const cnt = await test.count({ where: { tester_id: testerId } });
-            if (page > Math.round(cnt / pageSize)) return null;
-            if ((page + 1) > Math.round(cnt / pageSize)) hasNextPage = false;
+            if (page > Math.ceil(cnt / pageSize)) return null;
+            if ((page + 1) > Math.ceil(cnt / pageSize)) hasNextPage = false;
 
             data.start = start;
 
@@ -116,9 +116,9 @@ const inspectionService = {
         else start = (page - 1) * pageSize;
 
         try {
-            const cnt = await test.count({ where: { isdefected: 1 } });
-            if (page > Math.round(cnt / pageSize)) return null;
-            if ((page + 1) > Math.round(cnt / pageSize)) hasNextPage = false;
+            const cnt = await test.count({ where: { is_defected: 1 } });
+            if (page > Math.ceil(cnt / pageSize)) return null;
+            if ((page + 1) > Math.ceil(cnt / pageSize)) hasNextPage = false;
 
             data.start = start;
 

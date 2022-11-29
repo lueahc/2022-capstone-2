@@ -138,6 +138,7 @@ const inspectionController = {
             const inspectionDetails = await inspectionService.retrieveInspectionDetails(testId);
 
             inspectionDetails.imageStr = imageStr;
+            console.log(inspectionDetails.result);
 
             return res.send(inspectionDetails);
         } catch (err) {

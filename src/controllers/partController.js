@@ -13,7 +13,11 @@ const getallparts = async (req, res) => {
         }
     );
 
-    return res.send(part);
+    const resData = {
+        result: part
+    }
+
+    return res.send(resData);
 };
 
 const updatePart = async (req, res) => {
