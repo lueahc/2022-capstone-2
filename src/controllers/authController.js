@@ -43,7 +43,7 @@ const authController = {
         const memberPhoneNum = req.body.phoneNum;
 
         if (!accessToken) return res.status(400).send('KAKAO_TOKEN_EMPTY');
-        if (!memberType) return res.status(400).send('MEMBER_TYPE_EMPTY');
+        //if (!memberType) return res.status(400).send('MEMBER_TYPE_EMPTY');
         if (!memberEmpNum) return res.status(400).send('MEMBER_EMP_NUM_EMPTY');
         if (!memberPhoneNum) return res.status(400).send('MEMBER_PHONE_NUM_EMPTY');
 

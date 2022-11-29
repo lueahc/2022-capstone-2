@@ -195,6 +195,7 @@ async function selectDefectedSortByPartAndResult(connection, data) {
 async function selectInspectionById(connection, testId) {
     const query = `
         select
+            test_id as testId,
             (select member.name from member where member_id = test.tester_id) as tester,
             (select part.name from part where test.part_id = part.part_id) as partName,
             (select part.stock from part where test.part_id = part.part_id) as partStock,

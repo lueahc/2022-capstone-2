@@ -7,10 +7,6 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node index.js"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/lueahc/2022-capstone-2.git"
-  },
   "author": "",
   "license": "ISC",
   "bugs": {
