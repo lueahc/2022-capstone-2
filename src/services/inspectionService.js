@@ -58,8 +58,14 @@ const inspectionService = {
         if (page <= 0) page = 1;
         else start = (page - 1) * pageSize;
 
-        try {
-            const cnt = await test.count({ where: { tester_id: testerId } });
+        try {            
+            let cnt;
+
+            if (sort == 'all') cnt = await test.count({ where: { tester_id: data.testerId } });
+            else if (sort == 'part') cnt = await test.count({ where: { tester_id: data.testerId, part_id: data.part } });
+            else if (sort == 'result') cnt = await test.count({ where: { tester_id: data.testerId, is_fixed: data.result } });
+            else if (sort == 'both') cnt = await test.count({ where: { tester_id: data.testerId, part_id: data.part, is_fixed: data.result } });
+
             if (page > Math.ceil(cnt / pageSize)) return null;
             if ((page + 1) > Math.ceil(cnt / pageSize)) hasNextPage = false;
 
@@ -116,7 +122,13 @@ const inspectionService = {
         else start = (page - 1) * pageSize;
 
         try {
-            const cnt = await test.count({ where: { is_defected: 1 } });
+            let cnt;
+
+            if (sort == 'all') cnt = await test.count({ where: { is_defected: 1 } });
+            else if (sort == 'part') cnt = await test.count({ where: { is_defected: 1, part_id: data.part } });
+            else if (sort == 'result') cnt = await test.count({ where: { is_defected: 1, is_fixed: data.result } });
+            else if (sort == 'both') cnt = await test.count({ where: { is_defected: 1, part_id: data.part, is_fixed: data.result } });
+
             if (page > Math.ceil(cnt / pageSize)) return null;
             if ((page + 1) > Math.ceil(cnt / pageSize)) hasNextPage = false;
 
